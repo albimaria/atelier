@@ -1,0 +1,22 @@
+# Render Blueprint for the Atelier API (free tier).
+# Free instances sleep after ~15 min idle and start fresh on wake, so the
+# SQLite demo database is re-seeded automatically. That's ideal for a portfolio demo.
+services:
+  - type: web
+    name: atelier-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.19.0
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://albimaria.github.io
