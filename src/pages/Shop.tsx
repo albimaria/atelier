@@ -1,10 +1,11 @@
 import { SlidersHorizontal } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { FilterList, type ShopFiltersState } from '../components/product/FilterList'
 import { FilterSheet } from '../components/product/FilterSheet'
 import { ProductGrid } from '../components/product/ProductGrid'
 import { products } from '../data/products'
+import { api, useApiStatus } from '../services/api'
 import type { Product } from '../types'
 
 function fromParams(params: URLSearchParams): ShopFiltersState {
@@ -65,7 +66,33 @@ export function Shop() {
   const [sheet, setSheet] = useState(false)
   const [search, setSearch] = useState(filters.q)
 
-  const results = useMemo(() => applyFilters(products, filters), [filters])
+  const local = useMemo(() => applyFilters(products, filters), [filters])
+  const { online } = useApiStatus()
+  const queryKey = params.toString()
+  const [remote, setRemote] = useState<{ key: string; items: Product[]; ms: number } | null>(null)
+
+  // When the API is up, filtering/sorting runs on the server (SQL); the local result shows instantly meanwhile.
+  useEffect(() => {
+    if (!online) return
+    const ctrl = new AbortController()
+    const f = fromParams(new URLSearchParams(queryKey))
+    const [minPrice, maxPrice] = f.price ? f.price.split('-') : []
+    const started = performance.now()
+    api
+      .products(
+        {
+          q: f.q, category: f.category, gender: f.gender, mood: f.mood, size: f.size, color: f.color,
+          minPrice, maxPrice, new: f.isNew ? 1 : undefined, sort: f.sort, limit: 100,
+        },
+        ctrl.signal,
+      )
+      .then((r) => setRemote({ key: queryKey, items: r.items, ms: Math.round(performance.now() - started) }))
+      .catch(() => {})
+    return () => ctrl.abort()
+  }, [online, queryKey])
+
+  const fromApi = online && remote?.key === queryKey
+  const results = fromApi ? remote.items : local
 
   function write(next: ShopFiltersState) {
     const p = new URLSearchParams()
@@ -83,12 +110,17 @@ export function Shop() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-16">
-      <p className="text-[11px] tracking-[0.28em] uppercase text-mist">Shop</p>
+      <p className="eyebrow">Shop</p>
       <h1 className="editorial-title mt-2 text-5xl md:text-7xl">The collection</h1>
       <p className="mt-4 max-w-xl text-mist">
         {results.length} piece{results.length === 1 ? '' : 's'}
         {filters.category ? ` in ${filters.category}` : ''}
         {filters.mood ? ` · ${filters.mood}` : ''}
+        {fromApi && (
+          <span className="ml-3 inline-flex items-center gap-1.5 rounded-full border border-line/15 px-2.5 py-0.5 align-middle text-[10px] tracking-[0.16em] uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Filtered by API · {remote.ms}ms
+          </span>
+        )}
       </p>
 
       <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

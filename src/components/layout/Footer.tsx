@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { ApiStatusBadge } from './ApiStatusBadge'
+import { REPO_URL } from './DemoBanner'
 
 const columns = [
   {
@@ -85,8 +87,14 @@ export function Footer() {
           ATELIER
         </p>
       </div>
-      <div className="relative border-t border-line/10 px-5 py-6 text-center text-xs text-mist md:px-8">
-        © {new Date().getFullYear()} Atelier. All rights reserved.
+      <div className="relative space-y-4 border-t border-line/10 px-5 py-6 text-center text-xs text-mist md:px-8">
+        <ApiStatusBadge />
+        <p>
+          © {new Date().getFullYear()} Atelier. A portfolio project by Albi Maria, not a real store.{' '}
+          <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-ink">
+            Source code
+          </a>
+        </p>
       </div>
     </footer>
   )

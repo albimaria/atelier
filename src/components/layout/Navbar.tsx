@@ -1,6 +1,7 @@
 import { Heart, Menu, Moon, Search, ShoppingBag, Sun, User, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useUI } from '../../context/UIContext'
 import { useWishlist } from '../../context/WishlistContext'
@@ -25,6 +26,8 @@ export function Navbar() {
   const { ids } = useWishlist()
   const { setSearchOpen, setCartOpen, menuOpen, setMenuOpen } = useUI()
   const location = useLocation()
+  const { user } = useAuth()
+  const accountPath = user ? '/profile' : '/login'
   const { theme, toggle: toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
@@ -97,7 +100,7 @@ export function Navbar() {
             {ids.length > 0 && <span className={badge}>{ids.length}</span>}
           </Link>
           <Link
-            to="/login"
+            to={accountPath}
             aria-label="Account"
             className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-line/[0.08] md:grid"
           >
@@ -144,8 +147,8 @@ export function Navbar() {
               <Link to="/wishlist" className="text-[12px] tracking-[0.2em] uppercase text-mist" onClick={() => setMenuOpen(false)}>
                 Wishlist
               </Link>
-              <Link to="/login" className="text-[12px] tracking-[0.2em] uppercase text-mist" onClick={() => setMenuOpen(false)}>
-                Account
+              <Link to={accountPath} className="text-[12px] tracking-[0.2em] uppercase text-mist" onClick={() => setMenuOpen(false)}>
+                {user ? 'Profile' : 'Account'}
               </Link>
             </div>
           </nav>

@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .backup
+
+# Local API database
+server/data/

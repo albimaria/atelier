@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { useUI } from '../../context/UIContext'
+import { api, ApiError, getApiStatus } from '../../services/api'
 import { Reveal } from '../common/Reveal'
 import { Aurora } from '../fx/Aurora'
 import { TiltCard } from '../fx/TiltCard'
@@ -29,11 +30,16 @@ export function Newsletter() {
         <TiltCard max={6} className="mx-auto max-w-3xl rounded-[36px]">
           <form
             className="glass glow-border relative overflow-hidden rounded-[36px] px-6 py-16 text-center md:px-16 md:py-20"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault()
               if (!email.includes('@')) return
-              notify('You’re on the list.')
-              setEmail('')
+              try {
+                if (getApiStatus() === 'online') await api.subscribe(email)
+                notify('You’re on the list.')
+                setEmail('')
+              } catch (err) {
+                notify(err instanceof ApiError ? err.message : 'Could not subscribe right now.')
+              }
             }}
           >
             <p className="eyebrow justify-center">The list</p>

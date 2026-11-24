@@ -6,6 +6,8 @@ type WishlistContextValue = {
   ids: string[]
   toggle: (productId: string) => boolean
   has: (productId: string) => boolean
+  /** Replace the whole wishlist (used when syncing with the signed-in account). */
+  replace: (ids: string[]) => void
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null)
@@ -41,7 +43,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   const has = useCallback((productId: string) => ids.includes(productId), [ids])
 
-  const value = useMemo(() => ({ ids, toggle, has }), [ids, toggle, has])
+  const replace = useCallback((next: string[]) => setIds(next), [])
+
+  const value = useMemo(() => ({ ids, toggle, has, replace }), [ids, toggle, has, replace])
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>
 }
