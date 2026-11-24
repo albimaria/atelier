@@ -5,6 +5,7 @@ A full-stack fashion storefront with an immersive 3D interface and a REST API.
 > **This is a portfolio project, not a real shop.** It exists to show frontend and backend engineering to interviewers and recruiters. Nothing is sold, no payment is taken, and nothing is shipped. Demo data resets on its own.
 
 **Live site:** https://albimaria.github.io/atelier/  
+**API docs:** https://atelier-api-7mbw.onrender.com/api/docs (free tier, so the first request after idle can take up to a minute)  
 **Demo account:** click *Explore with the demo account* on the sign-in page, or use `demo@atelier.dev` / `atelier-demo`
 
 ## What to look at
@@ -63,4 +64,4 @@ The frontend reads the API address from `VITE_API_URL` (see `.env.development`).
 ## Deployment
 
 - **Frontend:** every push to `main` runs the API tests, then builds and publishes the site to GitHub Pages ([`deploy.yml`](.github/workflows/deploy.yml)).
-- **API:** [`render.yaml`](render.yaml) is a Render Blueprint (free tier). Set the repository variable `VITE_API_URL` to the API's public URL so the site connects to it.
+- **API:** [`render.yaml`](render.yaml) is a Render Blueprint (free tier). The site's build points at the deployed API through `VITE_API_URL` in the workflow; a repository variable of the same name overrides it.
