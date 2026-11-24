@@ -2,7 +2,7 @@
 
 A premium fashion and lifestyle storefront with an immersive 3D interface, in dark and light themes.
 
-**Live site:** _link added after the first deploy_
+**Live site:** https://albimaria.github.io/atelier/
 
 ## Highlights
 
